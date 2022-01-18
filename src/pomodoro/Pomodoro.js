@@ -108,9 +108,12 @@ function Pomodoro() {
         return 100 - (progressMax - remaining) / (progressMax) * 100
     }
 
-    // function setFocusDurationValue() {
-    //     setFocusDuration(focusDuration - 5)
-    // }
+    function focusHandler(focus) {
+        (focus === "decrease") ? setFocusDuration(Math.max(focusDuration - 5, 5)) : setFocusDuration(Math.min(focusDuration + 5, 60))
+    }
+    function breakHandler(word) {
+        (word === "decrease") ? setBreakDuration(Math.max(breakDuration - 1, 1)) : setBreakDuration(Math.min(breakDuration + 1, 15))
+    }
 
   return (
     <div className="pomodoro">
@@ -126,7 +129,7 @@ function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="decrease-focus"
-                onClick={() => setFocusDuration(Math.max(focusDuration - 5, 5))}
+                onClick={() => focusHandler("decrease")}
               >
                 <span className="oi oi-minus" />
               </button>
@@ -134,7 +137,7 @@ function Pomodoro() {
                 type="button"
                 className="btn btn-secondary"
                 data-testid="increase-focus"
-                onClick={() => setFocusDuration(Math.min(focusDuration + 5, 60))}
+                onClick={() => focusHandler("increase")}
               >
                 <span className="oi oi-plus" />
               </button>
@@ -154,7 +157,7 @@ function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="decrease-break"
-                  onClick={() => setBreakDuration(Math.max(breakDuration - 1, 1))}
+                  onClick={() => breakHandler("decrease")}
                 >
                   <span className="oi oi-minus" />
                 </button>
@@ -162,7 +165,7 @@ function Pomodoro() {
                   type="button"
                   className="btn btn-secondary"
                   data-testid="increase-break"
-                  onClick={() => setBreakDuration(Math.min(breakDuration + 1, 15))}
+                  onClick={() => breakHandler("increase")}
                 >
                   <span className="oi oi-plus" />
                 </button>
