@@ -3,7 +3,8 @@ import classNames from "../utils/class-names";
 import useInterval from "../utils/useInterval";
 import {minutesToDuration} from "../utils/duration";
 import {secondsToDuration} from "../utils/duration";
-
+import DurationHandler from "../duration-handler/DurationHandler";
+import MediaHandler from "../media-handler/MediaHandler";
 // These functions are defined outside of the component to insure they do not have access to state
 // and are, therefore more likely to be pure.
 
@@ -52,7 +53,7 @@ function nextSession(focusDuration, breakDuration) {
 function Pomodoro() {
     // Timer starts out paused
     const [isTimerRunning, setIsTimerRunning] = useState(false);
-    // The current session - null where there is no session running
+    // // The current session - null where there is no session running
     const [session, setSession] = useState(null);
     const [focusDuration, setFocusDuration] = useState(25);
     const [breakDuration, setBreakDuration] = useState(5);
@@ -61,7 +62,6 @@ function Pomodoro() {
 
     useInterval(
         () => {
-            // console.log(session);
             setProgress(secondsScaled(progressMax - session.timeRemaining));
             setProgressMax(
                 (session.label === "Focusing") ? (focusDuration * 60) : (breakDuration * 60)
@@ -99,6 +99,7 @@ function Pomodoro() {
         });
     }
 
+
     function stopButton() {
         setIsTimerRunning(false);
         setSession(null);
@@ -111,105 +112,26 @@ function Pomodoro() {
     function focusHandler(focus) {
         (focus === "decrease") ? setFocusDuration(Math.max(focusDuration - 5, 5)) : setFocusDuration(Math.min(focusDuration + 5, 60))
     }
+
     function breakHandler(word) {
         (word === "decrease") ? setBreakDuration(Math.max(breakDuration - 1, 1)) : setBreakDuration(Math.min(breakDuration + 1, 15))
     }
 
   return (
     <div className="pomodoro">
-      <div className="row">
+        <DurationHandler
+            focusHandler={focusHandler}
+            breakHandler={breakHandler}
+            focusDuration={focusDuration}
+            breakDuration={breakDuration}
+        />
 
-        <div className="col">
-          <div className="input-group input-group-lg mb-2">
-            <span className="input-group-text" data-testid="duration-focus">
-              Focus Duration: {minutesToDuration(focusDuration)}
-            </span>
-            <div className="input-group-append">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-testid="decrease-focus"
-                onClick={() => focusHandler("decrease")}
-              >
-                <span className="oi oi-minus" />
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-testid="increase-focus"
-                onClick={() => focusHandler("increase")}
-              >
-                <span className="oi oi-plus" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="col">
-          <div className="float-right">
-            <div className="input-group input-group-lg mb-2">
-              <span className="input-group-text" data-testid="duration-break">
-                Break Duration: {minutesToDuration(breakDuration)}
-              </span>
-              <div className="input-group-append">
-
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-testid="decrease-break"
-                  onClick={() => breakHandler("decrease")}
-                >
-                  <span className="oi oi-minus" />
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-testid="increase-break"
-                  onClick={() => breakHandler("increase")}
-                >
-                  <span className="oi oi-plus" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col">
-          <div
-            className="btn-group btn-group-lg mb-2"
-            role="group"
-            aria-label="Timer controls"
-          >
-            <button
-              type="button"
-              className="btn btn-primary"
-              data-testid="play-pause"
-              title="Start or pause timer"
-              onClick={playPause}
-            >
-              <span
-                className={classNames({
-                  oi: true,
-                  "oi-media-play": !isTimerRunning,
-                  "oi-media-pause": isTimerRunning,
-                })}
-              />
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-testid="stop"
-              title="Stop the session"
-              onClick={() => stopButton()}
-              disabled={session === null}
-            >
-              <span className="oi oi-media-stop" />
-            </button>
-          </div>
-        </div>
-      </div>
+        <MediaHandler
+            playPause={playPause}
+            stopButton={stopButton}
+            isTimerRunning={isTimerRunning}
+            session={session}
+        />
 
       <div>
         {(session !== null) &&
@@ -241,8 +163,6 @@ function Pomodoro() {
                 aria-valuemin="0"
                 aria-valuemax="100"
                 aria-valuenow={progress.toString()}
-                // time
-                // increases
                 style={{ width: `${progress}%` }}
 
               />
